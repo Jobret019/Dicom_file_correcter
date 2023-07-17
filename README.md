@@ -1,2 +1,2 @@
 # Dicom_file_correcter
-Correct dicom files who have problem with their image and structure position
+Correct dicom files ,who have problem with their image and structure position, using an Iterative Closest Point (ICP) algoritm.
