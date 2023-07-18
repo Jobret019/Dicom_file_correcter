@@ -2,44 +2,41 @@ import os
 import utils.Iterative_closest_point as icp
 import numpy as np 
 import utils.point_cloud as pc 
+import apply_icp
+import shutil
 
-def flip_image_point_cloud(image_cloud) : 
+def empty_copy(old_patient_folder_path,destination_path,title) : 
     '''
-    This method flip an image point cloud relative to the z axis 
-    
-    :param image_cloud : the image cloud to flip 
+    This method create a copy of a patient dicom folder with no dicom file in it
 
-    :return : an image point cloud with the z inverse
+    :param old_patient_folder_path : the path of the patient file to be copy  
+    :param destination_path : the path of the destination of the copyt 
+    :param title : the new title of the patient folder 
+
+    :return : None 
     '''
-    inversion_matrix=np.array([[1,0,0],[0,1,0],[0,0,-1]])
-    inverse_image_cloud=np.dot(inversion_matrix,image_cloud ) 
-    return inverse_image_cloud 
+    new_patient_folder_path=os.path.join(destination_path,title)
+    shutil.copytree(old_patient_folder_path,new_patient_folder_path) 
+    study=os.listdir(new_patient_folder_path)[0]
+    study_path=os.path.join(new_patient_folder_path,study)
+    series=os.listdir(study_path)
+    for serie in range(len(series)) : 
+        serie_path=os.path.join(study_path,series[serie])
+        if serie==0 : 
+            images=os.listdir(serie_path) 
+            for image in range(len(images)) : 
+                image_path=os.path.join(serie_path,images[image])
+                os.remove(image_path) 
+        else : 
+            file_name=os.listdir(serie_path)[0] 
+            path_to_dicom_file=os.path.join(serie_path,file_name) 
+            os.remove(path_to_dicom_file)
 
-def icp_translation(path_series0,path_RTPLAN,inverse=None) : 
-    '''
-    This method find the optimal translation to register two point cloud together 
-    using the ICP algorithm  
-
-    :param path_series0 : the path of series0 of the patient 
-    :param path_RTPALN : The path of the RTPLAN file of the patient
-    :param inverse : if inverse is True, the method will first inverse the image point 
-    cloud in the z axis
-
-    :return : the translation to register the 2 point cloud 
-
-    '''
-    image_cloud=pc.image_point_cloud(path_series0) 
-    source_cloud=pc.source_point_cloud(path_RTPLAN)
-    if inverse==True : 
-        image_cloud=flip_image_point_cloud(image_cloud)
-    transformation=icp.IterativeClosestPoint(image_cloud,source_cloud) 
-    translation = transformation[1]    
-    return translation
-
-def patients_folder_translation(path_to_patients_folder,inverse=None) : 
+def patients_folder_translation(path_to_patients_folder) : 
     '''
     This method takes a folder of patient and create a dictionnary that associate 
-    a patient with the translation that is necessary to register his 2 point cloud
+    a patient with the translation that is necessary to register his 2 point cloud in a 
+    case of z inverted position. 
 
     :param path_to_patients_folder : the path of the folder containing all the patients 
     that need a correction 
@@ -57,7 +54,10 @@ def patients_folder_translation(path_to_patients_folder,inverse=None) :
     for i in range(len(dict_paths_of_folder['list_path_series0'])) : 
         path_series0=dict_paths_of_folder['list_path_series0'][i] 
         path_RTPLAN=dict_paths_of_folder['list_path_RTPLAN'][i] 
-        translation=icp_translation(path_series0,path_RTPLAN)
+        image_cloud=pc.image_point_cloud(path_series0)
+        source_cloud=pc.source_point_cloud(path_RTPLAN)
+        image_cloud=apply_icp.flip_image_point_cloud(image_cloud)
+        translation=apply_icp.icp_translation(image_cloud,source_cloud)
         dict_patient_translation[patients[i]]=translation 
     
     return dict_patient_translation
