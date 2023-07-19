@@ -1,4 +1,4 @@
-from position_patient_coordinate import pixel_position_in_patient_coordinate,source_position_in_patient_coordinate
+import position_patient_coordinate as ppc
 import pydicom 
 import numpy as np
 import os 
@@ -26,7 +26,7 @@ def image_point_cloud(path_to_serie) :
     list_z_position=np.array([])
 
     paths = os.listdir(path_to_serie)
-    pixel_positions_x,pixel_positions_y,_=pixel_position_in_patient_coordinate(os.path.join(path_to_serie,paths[0]))
+    pixel_positions_x,pixel_positions_y,_=ppc.pixel_position_in_patient_coordinate(os.path.join(path_to_serie,paths[0]))
 
     for i in range(len(paths)) : 
         complete_path=os.path.join(path_to_serie,paths[i])
@@ -68,7 +68,7 @@ def source_point_cloud(path_to_plan) :
     aplication_setups=open_plan.ApplicationSetupSequence
 
     for i in range(len(aplication_setups)) :
-        source_position= source_position_in_patient_coordinate(path_to_plan,i) 
+        source_position= ppc.source_position_in_patient_coordinate(path_to_plan,i) 
         if source_position==None : 
             list_source_position+=[]       
         elif len(source_position)==2 :
