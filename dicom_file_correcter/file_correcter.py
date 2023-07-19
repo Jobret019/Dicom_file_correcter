@@ -6,17 +6,34 @@ import os
 import pydicom
 import shutil
 
-def patient_correcter(path_to_patient,x_translation,y_translation,z_translation) : 
-    ###PAS FINI
-    series=os.listdir(path_to_patient) 
+def patient_correcter(path_to_patient,destination_path,x_translation,y_translation,z_translation,title) : 
+    empty_copy(path_to_patient,destination_path,title)
+    path_to_corrected_patient=os.path.abspath(title)
+
+    study=os.listdir(path_to_patient)[0]
+    path_to_study=os.path.join(path_to_patient,study)
+
+    corrected_patient_study=os.listdir(path_to_corrected_patient)[0]
+    path_to_corrected_patient_study=os.path.join(path_to_corrected_patient,corrected_patient_study)
+
+    series=os.listdir(path_to_study)
+    series_corrected_patient=os.listdir(path_to_corrected_patient_study)
+
     for serie in range(len(series)) : 
         if serie==0 : 
-            path_series0=os.path.join(path_to_patient,series[serie])
-            series0_folder_correcter(path_series0)
+            path_series0=os.path.join(path_to_study,series[serie])
+            path_corrected_patient_series0=os.path.join(path_to_corrected_patient_study,series_corrected_patient[serie])
+            series0_folder_correcter(path_series0,path_corrected_patient_series0,x_translation,y_translation,z_translation)
 
-def RTSTRUCT_file_correcter(path_to_structure,x_translation,y_translation,z_translation,title) :
+        if serie==1 : 
+            path_series1=os.path.join(path_to_study,series[serie])
+            rtdose=os.listdir(path_series1)[0]
+            path_RTDOSE=os.path.join(path_series1,rtdose)
+            delete_DVH(path_RTDOSE,title) 
+
+def RTSTRUCT_file_correcter(path_to_structure,z_translation,title) :
     '''
-    This method create a corrected RTSTRUCT file from an RTSTRUCT file with incorrect contour 
+    This method create a corrected RTSTRUCT file from an RTSTRUCT file with incorrect contour z
     position data  
 
     :param path_to_structure : the path of the RTSTRUCT Dicom file  
@@ -32,11 +49,13 @@ def RTSTRUCT_file_correcter(path_to_structure,x_translation,y_translation,z_tran
     for structure in range(len(contours_sequence)) :
         contour_sequence=contours_sequence[structure].ContourSequence
         for contour in range(len(contour_sequence)) :
-            corrected_contour_data=contour_correcter(contour_sequence,contour,x_translation,y_translation,z_translation)
+            corrected_contour_data=contour_correcter(contour_sequence,contour,0,0,z_translation)
             ((open_structure.ROIContourSequence)[structure].ContourSequence)[contour].ContourData=corrected_contour_data
+    string_z_translation=str(z_translation)+' mm'
+    open_structure.StructureSetDescription='All the contours in these structures were corrected with an inversion and then a shift of '+string_z_translation+ 'in z'
     open_structure.save_as(title)
 
-def delete_DVH(path_to_RTDOSE) : 
+def delete_DVH(path_to_RTDOSE,title) : 
     '''
     This method create a RTDOSE Dicom file without DVH data from a RTDOSE 
     file with DVH data
@@ -49,12 +68,12 @@ def delete_DVH(path_to_RTDOSE) :
     del open_dose.DVHNormalizationValue 
     del open_dose.DVHNormalization 
     del open_dose.DVHSequence 
-    open_dose.save_as('RTDOSE.dcm')
+    open_dose.save_as(title)
 
 def series0_folder_correcter(path_to_series0,path_to_new_series0_folder,x_translation,y_translation,z_translation) : 
     '''
-    This method create a new series0 folder containing all the CT images file with shifted image 
-    position from another series0 folder 
+    This method create and transfer all the CT images file with shifted image position 
+    from another series0 folder in a new series0 folder  
 
     :param path_to_series0: the path of the series0 of the Dicom file
     :param path_to_new_series0_folder : the path of the folder where all the CT file will go 
@@ -90,6 +109,10 @@ def CT_image_file_correcter(path_to_CT_file,x_translation,y_translation,z_transl
     open_image.ImagePositionPatient[0]+=x_translation
     open_image.ImagePositionPatient[1]+=y_translation
     open_image.ImagePositionPatient[2]+=z_translation
+    string_x_translation=str(x_translation)+' mm'
+    string_y_translation=str(y_translation)+' mm'
+    string_z_translation=str(z_translation)+' mm'
+    open_image.ImageComments = 'The Image Position (Patient) was corrected with an inversion and then a shift of '+string_x_translation+' in x,'+string_y_translation+' in y and '+string_z_translation+' in z'
     open_image.save_as(title)
     
 
