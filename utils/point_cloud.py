@@ -4,24 +4,6 @@ import numpy as np
 import os 
 from dicompylercore import dicomparser
 
-def image_hu_data(path_to_image_file) : 
-    '''
-    This method create a 2D array with all the value of radiodensity in HU associated with every pixel 
-    of an image 
-    
-    :param path_to_image_file : complete path of an CT image file
-
-    :return : a 2d array of radiodensity value
-    '''
-    open_dicom=pydicom.dcmread(path_to_image_file)
-
-    rescale_slop=open_dicom.RescaleSlope
-    rescale_intercept=open_dicom.RescaleIntercept
-    
-    pixel_data=open_dicom.pixel_array 
-
-    data=pixel_data*rescale_slop+rescale_intercept
-    return data
 
 def image_point_cloud(path_to_serie) : 
     '''
@@ -110,3 +92,22 @@ def source_point_cloud(path_to_plan) :
     source_coordinates=np.array(new_list_source_position)
     
     return source_coordinates
+
+def image_hu_data(path_to_image_file) : 
+    '''
+    This method create a 2D array with all the value of radiodensity in HU associated with every pixel 
+    of an image 
+    
+    :param path_to_image_file : complete path of an CT image file
+
+    :return : a 2d array of radiodensity value
+    '''
+    open_dicom=pydicom.dcmread(path_to_image_file)
+
+    rescale_slop=open_dicom.RescaleSlope
+    rescale_intercept=open_dicom.RescaleIntercept
+    
+    pixel_data=open_dicom.pixel_array 
+
+    data=pixel_data*rescale_slop+rescale_intercept
+    return data
