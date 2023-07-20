@@ -1,10 +1,27 @@
 import utils.Iterative_closest_point as icp 
 import numpy as np 
 import utils.point_cloud as pc
-from patient_folder import empty_copy
+from patient_folder import empty_copy,patients_folder_translation
 import os
 import pydicom
 import shutil
+
+def patient_folder_corrector(path_main_directory,destination_path,path_to_folder,dict_patient_translation) : 
+    '''
+    This method correct all the patient in a folder full of them. 
+    :param path_main_directory : the path of the folder containing the entire project 
+    :param destination path : the path of the location where the user want to put the patient folder 
+    :param path_to_folder : the path of the folder containing all the patient 
+    :param dict_patient_translation : a dictionnary with all the patient as keys and the translation for 
+    correction as value 
+
+    return : None 
+    '''
+    patients=os.listdir(path_to_folder) 
+    for patient in range(len(patients)) : 
+        path_to_patient=os.path.join(patients[patient])
+        translation=dict_patient_translation[patients[patient]] 
+        patient_correcter(path_main_directory,path_to_patient,destination_path,translation[0],translation[1],translation[2],patients[patient])
 
 def patient_correcter(path_main_directory,path_to_patient,destination_path,x_translation,y_translation,z_translation,title) : 
     '''
