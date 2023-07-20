@@ -1,2 +1,4 @@
 import file_correcter 
-import patient_folder 
+import utils.point_cloud as pc 
+import apply_icp
+import patient_folder
