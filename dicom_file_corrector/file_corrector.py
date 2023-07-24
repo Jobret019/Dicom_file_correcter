@@ -5,10 +5,11 @@ import os
 import pydicom
 import shutil
 
-def patient_folder_corrector(path_main_directory, destination_path, 
-                             path_to_folder, dict_patient_translation) :
+def patient_folder_corrector(path_main_directory: str, destination_path: str, 
+                             path_to_folder: str, dict_patient_translation: dict) -> None:
     """
     This method correct all the patient in a folder full of them. 
+
     :param path_main_directory : the path of the folder containing the entire project 
     :param destination_path : the path of the location where the user want to put the patient folder
     :param path_to_folder : the path of the folder containing all the patient 
@@ -26,10 +27,10 @@ def patient_folder_corrector(path_main_directory, destination_path,
                           translation[1], translation[2],
                           patients[patient])
 
-def patient_corrector(path_main_directory, path_to_patient,
-                      destination_path, x_translation,
-                      y_translation, z_translation,
-                      title) : 
+def patient_corrector(path_main_directory: str, path_to_patient: str,
+                      destination_path: str, x_translation: float,
+                      y_translation: float, z_translation: float,
+                      title: str) -> None : 
     """
     This method correct a patient folder with incorrect structure contour position and incorrect Image position 
     
@@ -88,7 +89,7 @@ def patient_corrector(path_main_directory, path_to_patient,
             new_path_rtstru = os.path.join(path_main_directory,rtstru)
             shutil.move(new_path_rtstru, path_corrected_patient_series3)   
         
-def RTSTRUCT_file_corrector(path_to_structure, z_translation, title) :
+def RTSTRUCT_file_corrector(path_to_structure: str, z_translation: float, title: str) -> None : 
     """
     This method create a corrected RTSTRUCT file from an RTSTRUCT file with inverted and 
     incorrect contour z position data  
@@ -110,7 +111,7 @@ def RTSTRUCT_file_corrector(path_to_structure, z_translation, title) :
     open_structure.StructureSetDescription = 'All the contours in these structures were corrected with an inversion and then a shift of '+string_z_translation+ ' in z'
     open_structure.save_as(title)
 
-def delete_DVH(path_to_RTDOSE, title) : 
+def delete_DVH(path_to_RTDOSE: str, title: str) -> None : 
     """
     This method create a RTDOSE Dicom file without DVH data from a RTDOSE 
     file with DVH related data
@@ -126,8 +127,9 @@ def delete_DVH(path_to_RTDOSE, title) :
     del open_dose.DVHSequence 
     open_dose.save_as(title)
 
-def series0_folder_corrector(path_to_series0, path_main_directory, path_to_new_series0_folder, 
-                             x_translation, y_translation, z_translation) : 
+def series0_folder_corrector(path_to_series0: str, path_main_directory: str,
+                              path_to_new_series0_folder: str, x_translation: float, 
+                              y_translation: float, z_translation: float) -> None : 
     """
     This method create and transfer all the corrected CT images file in a new series0 folder  
 
@@ -150,7 +152,8 @@ def series0_folder_corrector(path_to_series0, path_main_directory, path_to_new_s
                                 title)
         shutil.move(new_path, path_to_new_series0_folder) 
 
-def CT_image_file_corrector(path_to_CT_file, x_translation, y_translation, z_translation, title) : 
+def CT_image_file_corrector(path_to_CT_file: str, x_translation: float, y_translation: float, 
+                            z_translation: float, title: str) -> None : 
     """
     This method correct a CT file with inverted z position and shifted Image Position. The method 
     create a new corrected CT file 
@@ -174,11 +177,13 @@ def CT_image_file_corrector(path_to_CT_file, x_translation, y_translation, z_tra
     open_image.ImageComments = 'The Image Position (Patient) was corrected with an inversion in z and then a shift of '+string_x_translation+' in x, '+string_y_translation+' in y and '+string_z_translation+' in z'
     open_image.save_as(title)
     
-def contour_corrector(contour_sequence, contour, x_translation, y_translation, z_translation) :
+def contour_corrector(contour_sequence: object, contour: int, x_translation: float,
+                       y_translation: float, z_translation: float) -> np.array :
     """
-    This method inverse the z coordinate and then shift a structure contour in any direction
+    This method inverse the z coordinates and then shift a structure contours in a direction
 
-    :param contour_sequence : The contour sequence in which the contour position data are located 
+    :param contour_sequence : The contour sequence of the DICOM in which the contour position 
+    data are located 
     :param contour : the number link to the contour  
     :param x_translation : the value of the x component of the translation
     :param y_translation : the value of the y component of the translation
