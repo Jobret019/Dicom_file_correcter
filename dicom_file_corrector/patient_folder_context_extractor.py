@@ -3,7 +3,7 @@ import utils.point_cloud_array_creator as pc
 import Iterative_closest_point as icp
 import shutil
 
-def empty_copy(old_patient_folder_path, destination_path,title) : 
+def empty_copy(old_patient_folder_path: str, destination_path: str,title: str) -> None: 
     """
     This method create a copy of a patient dicom folder with no dicom file in it
 
@@ -30,7 +30,7 @@ def empty_copy(old_patient_folder_path, destination_path,title) :
             path_to_dicom_file = os.path.join(serie_path, file_name) 
             os.remove(path_to_dicom_file)
 
-def patients_folder_translation(path_to_patients_folder,non_icp_translations=None) : 
+def patients_folder_translation(path_to_patients_folder: str,non_icp_translations=None) -> dict: 
     """
     This method takes a folder of patient and create a dictionnary that associate 
     a patient with the translation that is necessary to register his 2 point cloud in a 
@@ -61,7 +61,7 @@ def patients_folder_translation(path_to_patients_folder,non_icp_translations=Non
     
     return dict_patient_translation
 
-def dict_path_folder_of_patient(path_to_patients_folder) : 
+def dict_path_folder_of_patient(path_to_patients_folder: str) -> dict: 
     """
     This method takes a folder with many patient and put , in a dictionnary, all the series0 and
     the RTPLAN file of patients. Note that we have to have all the CT files in the series0 and the RT 
