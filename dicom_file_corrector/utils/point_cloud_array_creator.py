@@ -2,7 +2,7 @@ import numpy as np
 import os 
 import pydicom
 
-def flip_image_point_cloud(image_cloud) : 
+def flip_image_point_cloud(image_cloud: np.array) -> np.array:
     """
     This method flip an image point cloud relative to the z axis 
     
@@ -14,7 +14,7 @@ def flip_image_point_cloud(image_cloud) :
     inverse_image_cloud = np.dot(inversion_matrix,image_cloud ) 
     return inverse_image_cloud 
 
-def image_point_cloud(path_to_serie) : 
+def image_point_cloud(path_to_serie: str) -> np.array:
     """
     This method create an array of 3 array (x,y,z position) with all the position in mm of 
     the pixels with the highest radiodensity value which correspond to source position in an image 
@@ -63,7 +63,7 @@ def image_point_cloud(path_to_serie) :
     return points_coordinate
 
 
-def source_point_cloud(path_to_plan) : 
+def source_point_cloud(path_to_plan: str) -> np.array:
     """
     This method create an array of 3 array (x,y,z position) with all the position of the sources given by the 
     RTPLAN file.  
@@ -102,7 +102,7 @@ def source_point_cloud(path_to_plan) :
     
     return source_coordinates
 
-def image_hu_data(path_to_image_file) : 
+def image_hu_data(path_to_image_file: str) -> np.array:
     """
     This method create a 2D array with all the value of radiodensity in HU associated with every pixel 
     of a CT image 
@@ -118,7 +118,7 @@ def image_hu_data(path_to_image_file) :
     data = pixel_data*rescale_slop+rescale_intercept
     return data
 
-def pixel_position_in_patient_coordinate(path_to_image_file) : 
+def pixel_position_in_patient_coordinate(path_to_image_file: str) -> tuple[list,list,float]: 
     """
     This method express the xyz position of the pixels in an image slice in the patient coordinate 
     system (mm).
@@ -159,7 +159,7 @@ def pixel_position_in_patient_coordinate(path_to_image_file) :
     
     return Position_X, Position_Y, Position_Z
 
-def source_position_in_patient_coordinate(path_to_plan, setup_number) :
+def source_position_in_patient_coordinate(path_to_plan: str, setup_number: int) -> np.array:
     """
     This method extract the position of a source in a RTPLAN dicom files .
     
