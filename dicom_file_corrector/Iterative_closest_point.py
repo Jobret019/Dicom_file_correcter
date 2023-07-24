@@ -3,7 +3,7 @@ import utils.point_cloud_array_creator as pc
 import Iterative_closest_point as icp
 from sklearn.neighbors import KDTree
 
-def apply_transformation_on_image_cloud(image_cloud, source_cloud) : 
+def apply_transformation_on_image_cloud(image_cloud: np.array, source_cloud: np.array) -> np.array : 
     """
     This method shift an image point cloud in the correct position in the case of a point
     cloud inverted relative to the z axis
@@ -12,7 +12,7 @@ def apply_transformation_on_image_cloud(image_cloud, source_cloud) :
     :param source_cloud : the source point cloud that the image_cloud is gonna be register 
     on 
 
-    :return : the corrected image point cloud witgh new point position. 
+    :return : the corrected image point cloud with new point position. 
     """
     image_cloud = pc.flip_image_point_cloud(image_cloud) 
     translation = icp_translation(image_cloud,source_cloud) 
@@ -20,7 +20,7 @@ def apply_transformation_on_image_cloud(image_cloud, source_cloud) :
     corrected_image_point_cloud = ApplyTransformation(image_cloud, I_matrix, translation) 
     return corrected_image_point_cloud 
 
-def icp_translation(image_cloud, source_cloud) : 
+def icp_translation(image_cloud: np.array, source_cloud: np.array) -> np.array : 
     """
     This method find the optimal translation to register two point cloud together 
     using the ICP algorithm  
