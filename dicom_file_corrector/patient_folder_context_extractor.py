@@ -30,7 +30,7 @@ def empty_copy(old_patient_folder_path, destination_path,title) :
             path_to_dicom_file = os.path.join(serie_path, file_name) 
             os.remove(path_to_dicom_file)
 
-def patients_folder_translation(path_to_patients_folder) : 
+def patients_folder_translation(path_to_patients_folder,non_icp_translations=None) : 
     """
     This method takes a folder of patient and create a dictionnary that associate 
     a patient with the translation that is necessary to register his 2 point cloud in a 
@@ -38,22 +38,26 @@ def patients_folder_translation(path_to_patients_folder) :
 
     :param path_to_patients_folder : the path of the folder containing all the patients 
     that need a correction 
+    :param non_icp_translations: a list of translation vector obtain by another way than icp
 
     :return : a dictionnary with all the patient as keys and the translation needed as 
     values
     """
     patients = os.listdir(path_to_patients_folder)
-    dict_patient_translation={} 
+    dict_patient_translation = {} 
     dict_paths_of_folder = dict_path_folder_of_patient(path_to_patients_folder) 
-    
-    for i in range(len(dict_paths_of_folder['list_path_series0'])) : 
-        path_series0 = dict_paths_of_folder['list_path_series0'][i] 
-        path_RTPLAN = dict_paths_of_folder['list_path_RTPLAN'][i] 
-        image_cloud = pc.image_point_cloud(path_series0)
-        source_cloud = pc.source_point_cloud(path_RTPLAN)
-        image_cloud = icp.flip_image_point_cloud(image_cloud)
-        translation = icp.icp_translation(image_cloud,source_cloud)
-        dict_patient_translation[patients[i]] = translation 
+    if non_icp_translations != None : 
+        for i in range(len(patients[i])) : 
+            dict_patient_translation[patients[i]] = non_icp_translations[i]
+    else : 
+        for i in range(len(dict_paths_of_folder['list_path_series0'])) : 
+            path_series0 = dict_paths_of_folder['list_path_series0'][i] 
+            path_RTPLAN = dict_paths_of_folder['list_path_RTPLAN'][i] 
+            image_cloud = pc.image_point_cloud(path_series0)
+            source_cloud = pc.source_point_cloud(path_RTPLAN)
+            image_cloud = pc.flip_image_point_cloud(image_cloud)
+            translation = icp.icp_translation(image_cloud,source_cloud)
+            dict_patient_translation[patients[i]] = translation 
     
     return dict_patient_translation
 
