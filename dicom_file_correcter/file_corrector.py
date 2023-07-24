@@ -1,7 +1,6 @@
-import utils.Iterative_closest_point as icp 
 import numpy as np 
-import utils.point_cloud as pc
-from patient_folder import empty_copy,patients_folder_translation
+import utils.point_cloud_array_creator as pc
+from patient_folder_context_extractor import empty_copy
 import os
 import pydicom
 import shutil
@@ -21,9 +20,9 @@ def patient_folder_corrector(path_main_directory,destination_path,path_to_folder
     for patient in range(len(patients)) : 
         path_to_patient=os.path.join(patients[patient])
         translation=dict_patient_translation[patients[patient]] 
-        patient_correcter(path_main_directory,path_to_patient,destination_path,translation[0],translation[1],translation[2],patients[patient])
+        patient_corrector(path_main_directory,path_to_patient,destination_path,translation[0],translation[1],translation[2],patients[patient])
 
-def patient_correcter(path_main_directory,path_to_patient,destination_path,x_translation,y_translation,z_translation,title) : 
+def patient_corrector(path_main_directory,path_to_patient,destination_path,x_translation,y_translation,z_translation,title) : 
     '''
     This method correct a patient folder with incorrect structure contour position and incorrect Image position 
     
@@ -53,7 +52,7 @@ def patient_correcter(path_main_directory,path_to_patient,destination_path,x_tra
         if serie==0 : 
             path_series0=os.path.join(path_to_study,series[serie])
             path_corrected_patient_series0=os.path.join(path_to_corrected_patient_study,series_corrected_patient[serie])
-            series0_folder_correcter(path_series0,path_main_directory,path_corrected_patient_series0,x_translation,y_translation,z_translation)
+            series0_folder_corrector(path_series0,path_main_directory,path_corrected_patient_series0,x_translation,y_translation,z_translation)
 
         elif serie==1 : 
             path_series1=os.path.join(path_to_study,series[serie])
@@ -77,7 +76,7 @@ def patient_correcter(path_main_directory,path_to_patient,destination_path,x_tra
             path_corrected_patient_series3=os.path.join(path_to_corrected_patient_study,series_corrected_patient[serie])
             rtstru=os.listdir(path_series3)[0]
             path_RTSTRUC=os.path.join(path_series3,rtstru)
-            RTSTRUCT_file_correcter(path_RTSTRUC,z_translation,rtstru)
+            RTSTRUCT_file_corrector(path_RTSTRUC,z_translation,rtstru)
             new_path_rtstru=os.path.join(path_main_directory,rtstru)
             shutil.move(new_path_rtstru,path_corrected_patient_series3)   
         
@@ -85,7 +84,7 @@ def patient_correcter(path_main_directory,path_to_patient,destination_path,x_tra
 
 
 
-def RTSTRUCT_file_correcter(path_to_structure,z_translation,title) :
+def RTSTRUCT_file_corrector(path_to_structure,z_translation,title) :
     '''
     This method create a corrected RTSTRUCT file from an RTSTRUCT file with inverted and 
     incorrect contour z position data  
@@ -103,7 +102,7 @@ def RTSTRUCT_file_correcter(path_to_structure,z_translation,title) :
     for structure in range(len(contours_sequence)) :
         contour_sequence=contours_sequence[structure].ContourSequence
         for contour in range(len(contour_sequence)) :
-            corrected_contour_data=contour_correcter(contour_sequence,contour,0,0,z_translation)
+            corrected_contour_data=contour_corrector(contour_sequence,contour,0,0,z_translation)
             ((open_structure.ROIContourSequence)[structure].ContourSequence)[contour].ContourData=corrected_contour_data
     string_z_translation=str(z_translation)+' mm'
     open_structure.StructureSetDescription='All the contours in these structures were corrected with an inversion and then a shift of '+string_z_translation+ ' in z'
@@ -124,7 +123,7 @@ def delete_DVH(path_to_RTDOSE,title) :
     del open_dose.DVHSequence 
     open_dose.save_as(title)
 
-def series0_folder_correcter(path_to_series0,path_main_directory,path_to_new_series0_folder,x_translation,y_translation,z_translation) : 
+def series0_folder_corrector(path_to_series0,path_main_directory,path_to_new_series0_folder,x_translation,y_translation,z_translation) : 
     '''
     This method create and transfer all the corrected CT images file in a new series0 folder  
 
@@ -142,12 +141,12 @@ def series0_folder_correcter(path_to_series0,path_main_directory,path_to_new_ser
         complete_path=os.path.join(path_to_series0,images_files[image])
         title=images_files[image]
         new_path=os.path.join(path_main_directory,title)
-        CT_image_file_correcter(complete_path,x_translation,y_translation,z_translation,title)
+        CT_image_file_corrector(complete_path,x_translation,y_translation,z_translation,title)
         shutil.move(new_path,path_to_new_series0_folder) 
 
 
 
-def CT_image_file_correcter(path_to_CT_file,x_translation,y_translation,z_translation,title) : 
+def CT_image_file_corrector(path_to_CT_file,x_translation,y_translation,z_translation,title) : 
     '''
     This method correct a CT file with inverted z position and shifted Image Position. The method 
     create a new corrected CT file 
@@ -172,7 +171,7 @@ def CT_image_file_correcter(path_to_CT_file,x_translation,y_translation,z_transl
     open_image.save_as(title)
     
 
-def contour_correcter(contour_sequence,contour,x_translation,y_translation,z_translation) :
+def contour_corrector(contour_sequence,contour,x_translation,y_translation,z_translation) :
     '''
     This method inverse the z coordinate and then shift a structure contour in any direction
 

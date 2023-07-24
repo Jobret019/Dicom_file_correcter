@@ -1,8 +1,6 @@
 import os 
-import utils.Iterative_closest_point as icp
-import numpy as np 
-import utils.point_cloud as pc 
-import apply_icp
+import utils.point_cloud_array_creator as pc 
+import Iterative_closest_point as icp
 import shutil
 
 def empty_copy(old_patient_folder_path,destination_path,title) : 
@@ -56,8 +54,8 @@ def patients_folder_translation(path_to_patients_folder) :
         path_RTPLAN=dict_paths_of_folder['list_path_RTPLAN'][i] 
         image_cloud=pc.image_point_cloud(path_series0)
         source_cloud=pc.source_point_cloud(path_RTPLAN)
-        image_cloud=apply_icp.flip_image_point_cloud(image_cloud)
-        translation=apply_icp.icp_translation(image_cloud,source_cloud)
+        image_cloud=icp.flip_image_point_cloud(image_cloud)
+        translation=icp.icp_translation(image_cloud,source_cloud)
         dict_patient_translation[patients[i]]=translation 
     
     return dict_patient_translation
